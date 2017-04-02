@@ -1,1 +1,554 @@
-Hello World
+
+<!DOCTYPE html>
+<html>
+<head>
+  <script src="https://cdn.rawgit.com/konvajs/konva/1.5.0/konva.min.js"></script>
+  <meta charset="utf-8">
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      overflow: hidden;
+      background-color: #F0F0F0;
+    }
+  </style>
+</head>
+<body onkeydown="uniKeyCode(event)">
+  <div id="container"></div>
+  <p>W - iedarbina procesu, uz ko gaidīt</p>
+  <p>I - pārtrauc procesu nākamajā "running" fāzē</p>
+  <span id="info"></span><br>
+  Procesa stāvokļa ilgums (sekundes): <input type="text" id="duration" value="1"><br>
+  <button onclick="next(newC, null, null, null);">Sākt ciklu</button>
+  <script>
+  
+	var setInterrupt = false;
+	var setWait = false;
+  
+	function uniKeyCode(event) {
+		var key = event.which || event.keyCode;
+		switch (key) {
+			case 73:
+				setInterrupt = !setInterrupt;
+				setWait = false;
+				if (setInterrupt) {
+					document.getElementById("info").innerHTML = "Pārtraukums uzstādīts";
+				} else {
+					document.getElementById("info").innerHTML = null;
+				}
+				break;
+			case 87:
+				setInterrupt = false;
+				setWait = !setWait;
+				if (setWait) {
+					document.getElementById("info").innerHTML = "I/O operācija iedarbināta";
+				} else {
+					document.getElementById("info").innerHTML = null;
+				}
+				break;
+			default:
+				break;
+		}
+	}
+	
+	function clear() {
+		var c1 = 'black';
+		var c2 = 'white'	
+		newC.fill(c2);
+		readyC.fill(c2);
+		waitC.fill(c2);
+		runC.fill(c2);
+		termC.fill(c2);
+		
+		new2readyA.fill(c1);
+		new2readyA.stroke(c1);
+		new2readyT.hide();
+		
+		wait2readyA.fill(c1);
+		wait2readyA.stroke(c1);
+		wait2readyT.hide();
+		
+		ready2runA.fill(c1);
+		ready2runA.stroke(c1);
+		ready2runT.hide();
+		
+		run2waitA.fill(c1);
+		run2waitA.stroke(c1);
+		run2waitT.hide();
+		
+		run2readyA.fill(c1);
+		run2readyA.stroke(c1);
+		run2readyT.hide();
+		
+		run2termA.fill(c1);
+		run2termA.stroke(c1);
+		run2termT.hide();
+	}
+	
+	function next(elem, prevElem, prevArrow, prevText) {
+		var nextElem, arrow, text;
+		if (elem === newC) {
+			clear();
+		}
+		
+		switch (elem) {
+			case newC:
+				nextElem = readyC;
+				arrow = null;
+				text = null;
+				break;
+			case readyC:
+				nextElem = runC;
+				switch (prevElem) {
+					case newC:
+						arrow = new2readyA;
+						text = new2readyT;
+						break;
+					case waitC:
+						arrow = wait2readyA;
+						text = wait2readyT;
+						break;
+					default:
+						arrow = run2readyA;
+						text = run2readyT;
+						break;
+				}
+				break;
+			case waitC:
+				nextElem = readyC;
+				arrow = run2waitA;
+				text = run2waitT;
+				break;
+			case runC:
+				if (setWait) {
+					nextElem = waitC;
+					setWait = !setWait;
+					document.getElementById("info").innerHTML = null;
+				} else if (setInterrupt) {
+					nextElem = readyC;
+					setInterrupt = !setInterrupt;
+					document.getElementById("info").innerHTML = null;
+				} else {
+					nextElem = termC;
+				}
+				arrow = ready2runA;
+				text = ready2runT;
+				break;
+			case termC:
+				nextElem = null;
+				arrow = run2termA;
+				text = run2termT;
+				break;
+				
+		}
+		if (prevElem) {
+			prevElem.fill('white');
+			layer.draw();
+		}
+		if (prevArrow) {
+			prevArrow.fill('black');
+			prevArrow.stroke('black');
+			prevText.hide();
+			layer.draw();
+		}
+		if (elem) {
+			elem.fill('red');
+			layer.draw();
+			
+			if (arrow) {
+				arrow.fill('red');
+				arrow.stroke('red');
+				text.show();
+				layer.draw();
+			}
+		
+			setTimeout(function() {
+				next(nextElem, elem, arrow, text);
+			}, duration.value * 1000);
+		}	
+	}
+  
+	// main variables
+    var width = 1200;
+	var height = 800;
+	var radius = {
+		x: 100,
+		y: 70
+	};
+	var fontSize = 30
+
+	// stage variables
+	var stage = new Konva.Stage({
+		container: 'container',
+		width: width,
+		height: height
+	});
+	var layer = new Konva.Layer();
+
+	// process shapes
+	var newC = new Konva.Ellipse({
+		x: 150,
+		y: 150,
+		radius: radius,
+		fill: 'white',
+		stroke: 'black',
+		strokeWidth: 4
+	});
+	var readyC = new Konva.Ellipse({
+		x: 350,
+		y: 350,
+		radius: radius,
+		fill: 'white',
+		stroke: 'black',
+		strokeWidth: 4
+	});
+	var waitC = new Konva.Ellipse({
+		x: 550,
+		y: 550,
+		radius: radius,
+		fill: 'white',
+		stroke: 'black',
+		strokeWidth: 4
+	});
+	var runC = new Konva.Ellipse({
+		x: 750,
+		y: 350,
+		radius: radius,
+		fill: 'white',
+		stroke: 'black',
+		strokeWidth: 4
+	});
+	var termC = new Konva.Ellipse({
+		x: 950,
+		y: 150,
+		radius: radius,
+		fill: 'white',
+		stroke: 'black',
+		strokeWidth: 4
+	});
+	
+	// process labels
+	var newT = new Konva.Text({
+      x: newC.x() - 25,
+      y: newC.y() - 15,
+      text: 'new',
+      fontSize: fontSize,
+      fontFamily: 'Calibri',
+      fill: 'black'
+    });
+	var readyT = new Konva.Text({
+      x: readyC.x() - 35,
+      y: readyC.y() - 15,
+      text: 'ready',
+      fontSize: fontSize,
+      fontFamily: 'Calibri',
+      fill: 'black'
+    });
+	var waitT = new Konva.Text({
+      x: waitC.x() - 45,
+      y: waitC.y() - 15,
+      text: 'waiting',
+      fontSize: fontSize,
+      fontFamily: 'Calibri',
+      fill: 'black'
+    });
+	var runT = new Konva.Text({
+      x: runC.x() - 45,
+      y: runC.y() - 15,
+      text: 'running',
+      fontSize: fontSize,
+      fontFamily: 'Calibri',
+      fill: 'black'
+    });
+	var termT = new Konva.Text({
+      x: termC.x() - 65,
+      y: termC.y() - 15,
+      text: 'terminated',
+      fontSize: fontSize,
+      fontFamily: 'Calibri',
+      fill: 'black'
+    });
+	
+	// arrow objects
+	var new2readyA = new Konva.Arrow({
+      x: newC.x() + 65,
+      y: newC.y() + 60,
+      points: [0, 0, 70, 70],
+      pointerLength: 20,
+      pointerWidth : 20,
+      fill: 'black',
+      stroke: 'black',
+      strokeWidth: 10
+    });
+	
+	var wait2readyA = new Konva.Arrow({
+      x: waitC.x() - 65,
+      y: waitC.y() - 60,
+      points: [0, 0, -70, -70],
+      pointerLength: 20,
+      pointerWidth : 20,
+      fill: 'black',
+      stroke: 'black',
+      strokeWidth: 10
+    });
+	
+	var run2waitA = new Konva.Arrow({
+      x: runC.x() - 65,
+      y: runC.y() + 60,
+      points: [0, 0, -70, 70],
+      pointerLength: 20,
+      pointerWidth : 20,
+      fill: 'black',
+      stroke: 'black',
+      strokeWidth: 10
+    });
+	
+	var run2termA = new Konva.Arrow({
+      x: runC.x() + 65,
+      y: runC.y() - 60,
+      points: [0, 0, 70, -70],
+      pointerLength: 20,
+      pointerWidth : 20,
+      fill: 'black',
+      stroke: 'black',
+      strokeWidth: 10
+    });
+	
+	var run2readyA = new Konva.Arrow({
+      x: runC.x() - 80,
+      y: runC.y() - 50,
+      points: [0, 0, -230, 0],
+      pointerLength: 20,
+      pointerWidth : 20,
+      fill: 'black',
+      stroke: 'black',
+      strokeWidth: 10
+    });
+	
+	var ready2runA = new Konva.Arrow({
+      x: readyC.x() + 80,
+      y: readyC.y() + 50,
+      points: [0, 0, 230, 0],
+      pointerLength: 20,
+      pointerWidth : 20,
+      fill: 'black',
+      stroke: 'black',
+      strokeWidth: 10
+    });
+	
+	// text objects
+	var new2readyT = new Konva.Text({
+      x: new2readyA.x() - 200,
+      y: new2readyA.y(),
+      text: 'admitted',
+      fontSize: 30,
+      fontFamily: 'Calibri',
+      fill: 'black',
+      width: 300,
+      padding: 20,
+      align: 'center',
+      visible: false
+    });
+	
+	var wait2readyT = new Konva.Text({
+      x: wait2readyA.x() - 300,
+      y: wait2readyA.y() - 60,
+      text: 'I/O or event completion',
+      fontSize: 30,
+      fontFamily: 'Calibri',
+      fill: 'black',
+      width: 300,
+      padding: 20,
+      align: 'center',
+      visible: false
+    });
+	
+	var run2waitT = new Konva.Text({
+      x: run2waitA.x() - 30,
+      y: run2waitA.y() + 30,
+      text: 'I/O or event wait',
+      fontSize: 30,
+      fontFamily: 'Calibri',
+      fill: 'black',
+      width: 300,
+      padding: 20,
+      align: 'center',
+      visible: false
+    });
+	
+	var run2termT = new Konva.Text({
+      x: run2termA.x() - 20,
+      y: run2termA.y() - 65,
+      text: 'exit',
+      fontSize: 30,
+      fontFamily: 'Calibri',
+      fill: 'black',
+      width: 300,
+      padding: 20,
+      align: 'center',
+      visible: false
+    });
+	
+	var run2readyT = new Konva.Text({
+      x: run2readyA.x() - 265,
+      y: run2readyA.y() - 65,
+      text: 'interrupt',
+      fontSize: 30,
+      fontFamily: 'Calibri',
+      fill: 'black',
+      width: 300,
+      padding: 20,
+      align: 'center',
+      visible: false
+    });
+	
+	var ready2runT = new Konva.Text({
+      x: ready2runA.x(),
+      y: ready2runA.y() - 90,
+      text: 'scheduler dispatch',
+      fontSize: 30,
+      fontFamily: 'Calibri',
+      fill: 'black',
+      width: 250,
+      padding: 20,
+      align: 'center',
+      visible: false
+    });
+	
+	newC.on('click', function() {
+		var color = this.fill() == 'red' ? 'white' : 'red';
+		var arrowColor = color == 'red' ? 'red' : 'black';
+		if (color == 'red') {
+			clear();
+			new2readyT.show();
+		} else {
+			new2readyT.hide();
+		}			
+		new2readyA.fill(arrowColor);
+		new2readyA.stroke(arrowColor);
+		this.fill(color);
+		layer.draw();
+	});
+	
+	readyC.on('click', function() {
+		var color = this.fill() == 'red' ? 'white' : 'red';
+		var arrowColor = color == 'red' ? 'red' : 'black';
+		if (color == 'red') {
+			clear();
+			new2readyT.show();
+			run2readyT.show();
+			wait2readyT.show();
+			ready2runT.show();
+		} else {
+			new2readyT.hide();
+			run2readyT.hide();
+			wait2readyT.hide();
+			ready2runT.hide();
+		}			
+		new2readyA.fill(arrowColor);
+		new2readyA.stroke(arrowColor);
+		run2readyA.fill(arrowColor);
+		run2readyA.stroke(arrowColor);
+		wait2readyA.fill(arrowColor);
+		wait2readyA.stroke(arrowColor);
+		ready2runA.fill(arrowColor);
+		ready2runA.stroke(arrowColor);
+		this.fill(color);
+		layer.draw();
+	});
+	
+	waitC.on('click', function() {
+		var color = this.fill() == 'red' ? 'white' : 'red';
+		var arrowColor = color == 'red' ? 'red' : 'black';
+		if (color == 'red') {
+			clear();
+			wait2readyT.show();
+			run2waitT.show();
+		} else {
+			wait2readyT.hide();
+			run2waitT.hide();
+		}			
+		wait2readyA.fill(arrowColor);
+		wait2readyA.stroke(arrowColor);
+		run2waitA.fill(arrowColor);
+		run2waitA.stroke(arrowColor);
+		this.fill(color);
+		layer.draw();
+	});
+	
+	termC.on('click', function() {
+		var color = this.fill() == 'red' ? 'white' : 'red';
+		var arrowColor = color == 'red' ? 'red' : 'black';
+		if (color == 'red') {
+			clear();
+			run2termT.show();
+		} else {
+			run2termT.hide();
+		}			
+		run2termA.fill(arrowColor);
+		run2termA.stroke(arrowColor);
+		this.fill(color);
+		layer.draw();
+	});
+	
+	runC.on('click', function() {
+		var color = this.fill() == 'red' ? 'white' : 'red';
+		var arrowColor = color == 'red' ? 'red' : 'black';
+		if (color == 'red') {
+			clear();
+			run2waitT.show();
+			run2readyT.show();
+			run2termT.show();
+			ready2runT.show();
+		} else {
+			run2waitT.hide();
+			run2readyT.hide();
+			run2termT.hide();
+			ready2runT.hide();
+		}			
+		run2waitA.fill(arrowColor);
+		run2waitA.stroke(arrowColor);
+		run2readyA.fill(arrowColor);
+		run2readyA.stroke(arrowColor);
+		run2termA.fill(arrowColor);
+		run2termA.stroke(arrowColor);
+		ready2runA.fill(arrowColor);
+		ready2runA.stroke(arrowColor);
+		this.fill(color);
+		layer.draw();
+	});
+	
+	// draw objects
+	layer.add(newC);
+	layer.add(readyC);
+	layer.add(waitC);
+	layer.add(termC);
+	layer.add(runC);
+	
+	// draw labels
+	layer.add(newT);
+	layer.add(readyT);
+	layer.add(waitT);
+	layer.add(termT);
+	layer.add(runT);
+	
+	// draw arrows 
+	layer.add(new2readyA);
+	layer.add(wait2readyA);
+	layer.add(run2waitA);
+	layer.add(run2termA);
+	layer.add(run2readyA);
+	layer.add(ready2runA);
+	
+	// draw text
+	layer.add(new2readyT);
+	layer.add(wait2readyT);
+	layer.add(run2waitT);
+	layer.add(run2termT);
+	layer.add(run2readyT);
+	layer.add(ready2runT);
+	
+	stage.add(layer);
+  </script>
+</body>
+</html>
