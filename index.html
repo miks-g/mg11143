@@ -15,15 +15,27 @@
 </head>
 <body onkeydown="uniKeyCode(event)">
   <div id="container"></div>
-  <p>W - iedarbina procesu, uz ko gaidīt</p>
-  <p>I - pārtrauc procesu nākamajā "running" fāzē</p>
+  <p>W - iedarbina procesu, uz ko gaidīt, pazīme pazūd, kad sasniedz "running" fāzi</p>
+  <p>I - pārtrauc procesu nākamajā "running" fāzē, pazīme pazūd, kad sasniedz "running" fāzi</p>
   <span id="info"></span><br>
   Procesa stāvokļa ilgums (sekundes): <input type="text" id="duration" value="1"><br>
-  <button onclick="next(newC, null, null, null);">Sākt ciklu</button>
+  <button onclick="next(newC, null, null, null);" id="btn">Sākt ciklu</button>
   <script>
   
 	var setInterrupt = false;
 	var setWait = false;
+	var inCycle = false;
+	
+	function setArrowColorAndText(arrow, text, c, hideText) {
+		arrow.fill(c);
+		arrow.stroke(c);
+		if (hideText) {
+			text.hide();
+		} else {
+			text.show();
+		}
+		
+	};
   
 	function uniKeyCode(event) {
 		var key = event.which || event.keyCode;
@@ -51,45 +63,26 @@
 		}
 	}
 	
-	function clear() {
-		var c1 = 'black';
-		var c2 = 'white'	
-		newC.fill(c2);
-		readyC.fill(c2);
-		waitC.fill(c2);
-		runC.fill(c2);
-		termC.fill(c2);
+	function clear() {	
+		newC.fill('white');
+		readyC.fill('white');
+		waitC.fill('white');
+		runC.fill('white');
+		termC.fill('white');
 		
-		new2readyA.fill(c1);
-		new2readyA.stroke(c1);
-		new2readyT.hide();
-		
-		wait2readyA.fill(c1);
-		wait2readyA.stroke(c1);
-		wait2readyT.hide();
-		
-		ready2runA.fill(c1);
-		ready2runA.stroke(c1);
-		ready2runT.hide();
-		
-		run2waitA.fill(c1);
-		run2waitA.stroke(c1);
-		run2waitT.hide();
-		
-		run2readyA.fill(c1);
-		run2readyA.stroke(c1);
-		run2readyT.hide();
-		
-		run2termA.fill(c1);
-		run2termA.stroke(c1);
-		run2termT.hide();
+		setArrowColorAndText(new2readyA, new2readyT, 'black', true);
+		setArrowColorAndText(wait2readyA, wait2readyT, 'black', true);
+		setArrowColorAndText(ready2runA, ready2runT, 'black', true);
+		setArrowColorAndText(run2waitA, run2waitT, 'black', true);
+		setArrowColorAndText(run2readyA, run2readyT, 'black', true);
+		setArrowColorAndText(run2termA, new2readyT, 'black', true);
 	}
 	
 	function next(elem, prevElem, prevArrow, prevText) {
 		var nextElem, arrow, text;
 		if (elem === newC) {
 			clear();
-		}
+		}	
 		
 		switch (elem) {
 			case newC:
@@ -143,29 +136,23 @@
 		}
 		if (prevElem) {
 			prevElem.fill('white');
-			layer.draw();
 		}
 		if (prevArrow) {
-			prevArrow.fill('black');
-			prevArrow.stroke('black');
-			prevText.hide();
-			layer.draw();
+			setArrowColorAndText(prevArrow, prevText, 'black', true);
 		}
+
 		if (elem) {
 			elem.fill('red');
-			layer.draw();
 			
 			if (arrow) {
-				arrow.fill('red');
-				arrow.stroke('red');
-				text.show();
-				layer.draw();
-			}
-		
+				setArrowColorAndText(arrow, text, 'red', false);		
+			}		
+			layer.draw();
 			setTimeout(function() {
 				next(nextElem, elem, arrow, text);
 			}, duration.value * 1000);
-		}	
+		}
+		layer.draw();
 	}
   
 	// main variables
@@ -415,6 +402,7 @@
       visible: false
     });
 	
+	// onClick 
 	newC.on('click', function() {
 		var color = this.fill() == 'red' ? 'white' : 'red';
 		var arrowColor = color == 'red' ? 'red' : 'black';
@@ -548,6 +536,7 @@
 	layer.add(run2readyT);
 	layer.add(ready2runT);
 	
+	//draw stage
 	stage.add(layer);
   </script>
 </body>
