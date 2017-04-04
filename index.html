@@ -24,7 +24,6 @@
   
 	var setInterrupt = false;
 	var setWait = false;
-	var inCycle = false;
 	
 	function setArrowColorAndText(arrow, text, c, hideText) {
 		arrow.fill(c);
@@ -82,6 +81,8 @@
 		var nextElem, arrow, text;
 		if (elem === newC) {
 			clear();
+			inCycle = true;
+			document.getElementById("btn").disabled = true;
 		}	
 		
 		switch (elem) {
@@ -151,6 +152,8 @@
 			setTimeout(function() {
 				next(nextElem, elem, arrow, text);
 			}, duration.value * 1000);
+		} else {
+			document.getElementById("btn").disabled = false;
 		}
 		layer.draw();
 	}
@@ -404,106 +407,117 @@
 	
 	// onClick 
 	newC.on('click', function() {
-		var color = this.fill() == 'red' ? 'white' : 'red';
-		var arrowColor = color == 'red' ? 'red' : 'black';
-		if (color == 'red') {
-			clear();
-			new2readyT.show();
-		} else {
-			new2readyT.hide();
-		}			
-		new2readyA.fill(arrowColor);
-		new2readyA.stroke(arrowColor);
-		this.fill(color);
-		layer.draw();
+		if (document.getElementById("btn").disabled == false) {
+			var color = this.fill() == 'red' ? 'white' : 'red';
+			var arrowColor = color == 'red' ? 'red' : 'black';
+			if (color == 'red') {
+				clear();
+				new2readyT.show();
+			} else {
+				new2readyT.hide();
+			}			
+			new2readyA.fill(arrowColor);
+			new2readyA.stroke(arrowColor);
+			this.fill(color);
+			layer.draw();
+		}	
 	});
 	
 	readyC.on('click', function() {
-		var color = this.fill() == 'red' ? 'white' : 'red';
-		var arrowColor = color == 'red' ? 'red' : 'black';
-		if (color == 'red') {
-			clear();
-			new2readyT.show();
-			run2readyT.show();
-			wait2readyT.show();
-			ready2runT.show();
-		} else {
-			new2readyT.hide();
-			run2readyT.hide();
-			wait2readyT.hide();
-			ready2runT.hide();
-		}			
-		new2readyA.fill(arrowColor);
-		new2readyA.stroke(arrowColor);
-		run2readyA.fill(arrowColor);
-		run2readyA.stroke(arrowColor);
-		wait2readyA.fill(arrowColor);
-		wait2readyA.stroke(arrowColor);
-		ready2runA.fill(arrowColor);
-		ready2runA.stroke(arrowColor);
-		this.fill(color);
-		layer.draw();
+		if (document.getElementById("btn").disabled == false) {
+			var color = this.fill() == 'red' ? 'white' : 'red';
+			var arrowColor = color == 'red' ? 'red' : 'black';
+			if (color == 'red') {
+				clear();
+				new2readyT.show();
+				run2readyT.show();
+				wait2readyT.show();
+				ready2runT.show();
+			} else {
+				new2readyT.hide();
+				run2readyT.hide();
+				wait2readyT.hide();
+				ready2runT.hide();
+			}			
+			new2readyA.fill(arrowColor);
+			new2readyA.stroke(arrowColor);
+			run2readyA.fill(arrowColor);
+			run2readyA.stroke(arrowColor);
+			wait2readyA.fill(arrowColor);
+			wait2readyA.stroke(arrowColor);
+			ready2runA.fill(arrowColor);
+			ready2runA.stroke(arrowColor);
+			this.fill(color);
+			layer.draw();
+		}
 	});
 	
 	waitC.on('click', function() {
-		var color = this.fill() == 'red' ? 'white' : 'red';
-		var arrowColor = color == 'red' ? 'red' : 'black';
-		if (color == 'red') {
-			clear();
-			wait2readyT.show();
-			run2waitT.show();
-		} else {
-			wait2readyT.hide();
-			run2waitT.hide();
-		}			
-		wait2readyA.fill(arrowColor);
-		wait2readyA.stroke(arrowColor);
-		run2waitA.fill(arrowColor);
-		run2waitA.stroke(arrowColor);
-		this.fill(color);
-		layer.draw();
+		if (document.getElementById("btn").disabled == false) {
+			var color = this.fill() == 'red' ? 'white' : 'red';
+			var arrowColor = color == 'red' ? 'red' : 'black';
+			if (color == 'red') {
+				clear();
+				wait2readyT.show();
+				run2waitT.show();
+			} else {
+				wait2readyT.hide();
+				run2waitT.hide();
+			}			
+			wait2readyA.fill(arrowColor);
+			wait2readyA.stroke(arrowColor);
+			run2waitA.fill(arrowColor);
+			run2waitA.stroke(arrowColor);
+			this.fill(color);
+			layer.draw();
+		}
 	});
 	
 	termC.on('click', function() {
-		var color = this.fill() == 'red' ? 'white' : 'red';
-		var arrowColor = color == 'red' ? 'red' : 'black';
-		if (color == 'red') {
-			clear();
-			run2termT.show();
-		} else {
-			run2termT.hide();
-		}			
-		run2termA.fill(arrowColor);
-		run2termA.stroke(arrowColor);
-		this.fill(color);
-		layer.draw();
+		if (document.getElementById("btn").disabled == false) {
+			var color = this.fill() == 'red' ? 'white' : 'red';
+			var arrowColor = color == 'red' ? 'red' : 'black';
+			if (color == 'red') {
+				clear();
+				run2termT.show();
+			} else {
+				run2termT.hide();
+			}			
+			run2termA.fill(arrowColor);
+			run2termA.stroke(arrowColor);
+			this.fill(color);
+			layer.draw();
+		}
+		
 	});
 	
 	runC.on('click', function() {
-		var color = this.fill() == 'red' ? 'white' : 'red';
-		var arrowColor = color == 'red' ? 'red' : 'black';
-		if (color == 'red') {
-			clear();
-			run2waitT.show();
-			run2readyT.show();
-			run2termT.show();
-			ready2runT.show();
-		} else {
-			run2waitT.hide();
-			run2readyT.hide();
-			run2termT.hide();
-			ready2runT.hide();
-		}			
-		run2waitA.fill(arrowColor);
-		run2waitA.stroke(arrowColor);
-		run2readyA.fill(arrowColor);
-		run2readyA.stroke(arrowColor);
-		run2termA.fill(arrowColor);
-		run2termA.stroke(arrowColor);
-		ready2runA.fill(arrowColor);
-		ready2runA.stroke(arrowColor);
-		this.fill(color);
-		layer.draw();
+		if (document.getElementById("btn").disabled == false) {
+			var color = this.fill() == 'red' ? 'white' : 'red';
+			var arrowColor = color == 'red' ? 'red' : 'black';
+			if (color == 'red') {
+				clear();
+				run2waitT.show();
+				run2readyT.show();
+				run2termT.show();
+				ready2runT.show();
+			} else {
+				run2waitT.hide();
+				run2readyT.hide();
+				run2termT.hide();
+				ready2runT.hide();
+			}			
+			run2waitA.fill(arrowColor);
+			run2waitA.stroke(arrowColor);
+			run2readyA.fill(arrowColor);
+			run2readyA.stroke(arrowColor);
+			run2termA.fill(arrowColor);
+			run2termA.stroke(arrowColor);
+			ready2runA.fill(arrowColor);
+			ready2runA.stroke(arrowColor);
+			this.fill(color);
+			layer.draw();
+		}	
 	});
 	
 	// draw objects
